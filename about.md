@@ -11,4 +11,3 @@ permalink: /about/
 Research Assistant at Tübingen University at the chair for Database Management System.
 
 Really likes video games and programming. In no particular order.
-[jekyll-organization]: https://github.com/jekyll
