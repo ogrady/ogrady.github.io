@@ -1,0 +1,47 @@
+---
+layout: default
+---
+<link rel="stylesheet" href="/assets/css/cv.css">
+<p class="container projects-container">
+  <h2>Projects</h2>
+  <div class="row clearfix layout layout-top-middle">
+  {% assign projects = site.data.projects %} 
+  {%- for proj in projects -%}
+    <article>
+        <h3>{{proj.name}}</h3>
+        <p class="sub-details"><a href="{{proj.url}}">{{proj.url}}</a></p>
+        <p>{{proj.description}}</p>
+    </article>
+  {%- endfor -%}
+</p>
+
+<hr>
+
+<p class="container experience-container">
+    <h2>Experience</h2>
+    <div class="row clearfix layout layout-left">
+    {% assign experiences = site.data.experiences %} 
+    {%- for exp in experiences -%}
+        <article>
+            <h3>{{exp.position}} at {{exp.company}}</h3>
+            <p class="sub-details">{{exp.date_start}} – {{exp.date_end}}</p>
+            <p>{{exp.description}}</p>
+        </article>
+    {%- endfor -%}
+    </div>
+</p>
+
+<hr>
+
+<p class="container education-container">
+  <h2>Education</h2>
+  <div class="row clearfix layout layout-left">
+  {% assign educations = site.data.educations %} 
+  {%- for edu in educations -%}
+    <article>
+        <h3>{{edu.institution}} {{edu.location}}</h3>
+        <p class="sub-details">{{edu.date_start}} – {{edu.date_end}}</p>
+        <p>{{edu.degree}}</p>
+    </article>
+  {%- endfor -%}
+</p>
