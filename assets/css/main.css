@@ -1,0 +1,14 @@
+.center-image
+{
+    margin: 0 auto;
+    display: block;
+}
+
+.caption {
+    text-align: center;
+    font-style: italic;
+}
+
+.social-media-list {
+    width: 200px; /* to fix twitter handle breaking into new line */
+}
