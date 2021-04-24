@@ -309,5 +309,5 @@ root.markUnicodemathInHtmlCode = markUnicodemathInHtmlCode;
 root.markUnicodemathInHtmlDom = markUnicodemathInHtmlDom;
 root.renderMarkedUnicodemath = renderMarkedUnicodemath;
 root.renderUnicodemath = renderUnicodemath;
-
+document.body.onload = renderUnicodemath();
 })(this);
