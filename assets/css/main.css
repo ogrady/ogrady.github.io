@@ -9,6 +9,12 @@
     font-style: italic;
 }
 
+.center {
+  margin: auto;
+  width: 100%;
+  text-align: center;
+}
+
 .social-media-list {
     width: 200px; /* to fix twitter handle breaking into new line */
 }

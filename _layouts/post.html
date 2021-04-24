@@ -16,5 +16,10 @@ layout: default
     <footer>
       <!--&copy; to me-->
     </footer>
+    <!--<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>-->
+    <script src="{{ site.baseurl }}{% link assets/js/unicodemathml.js %}"></script>
+    <script>
+      document.body.onload = renderUnicodemath();
+    </script>
   </body>
 </html>

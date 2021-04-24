@@ -48,3 +48,17 @@ export function drawWall(canvasId, points, blockSize, wallStyle = "#4287f5", wal
     ctx.closePath();
     ctx.stroke();
 }
+
+export function fillRectangleWall(canvasId, points, blockSize, wallStyle = "#4287f5", wallWidth = 5) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext("2d");
+    const [blockWidth, blockHeight] = blockSize;
+
+    points = points.map(([x,y]) => [x*blockWidth, y*blockHeight]);
+
+    ctx.fillStyle = wallStyle;
+    ctx.lineWidth = wallWidth;
+    ctx.beginPath();
+    points.map(([x,y]) => ctx.fillRect(x, y, blockWidth, blockHeight))
+    ctx.stroke();
+}
