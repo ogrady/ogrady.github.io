@@ -8,6 +8,6 @@ permalink: /about/
   margin-right: auto;">
   <img src="/assets/images/me.png" />
 </p>
-Research Assistant at Tübingen University at the chair for Database Management System.
+My name is Daniel O'Grady. I have studied Computer Science at the Reutlingen University and the Eberhard Karls University Tübingen.
 
-Really likes video games and programming. In no particular order.
+I really like video games and programming. In no particular order.
