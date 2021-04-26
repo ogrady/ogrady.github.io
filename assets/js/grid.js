@@ -45,15 +45,10 @@ export class Grid {
     _path(points, consumer) {
         const [blockWidth, blockHeight] = this.blockSize;
         points = points.map(([x,y]) => [x*blockWidth, y*blockHeight]);
-
-        /*this.ctx.strokeStyle = wallStyle;
-        this.ctx.lineWidth = wallWidth;
-        */
-
         const [sx, sy] = points[0];
         this.ctx.moveTo(sx, sy);
         this.ctx.beginPath();        
-        points.map(consumer); //this.ctx.lineTo(x, y));
+        points.map(consumer);
         this.ctx.closePath();
         this.ctx.stroke();
         return this;        
@@ -72,5 +67,11 @@ export class Grid {
         return this._path(points, ([x,y]) => this.ctx.fillRect(x, y, blockWidth, blockHeight));
     }
 
-    //labelCell(canvasId, x, y, )
+    labelCell(x, y, text, {strokeStyle = "red", font = "20px Arial"} = {}) {
+        const [blockWidth, blockHeight] = this.blockSize;
+        this.ctx.font = font;
+        this.ctx.fillStyle = strokeStyle;
+        const {width} = this.ctx.measureText(text);
+        this.ctx.fillText(text, blockWidth * x + blockWidth/2 - width/2, blockHeight * y + blockHeight/2 );
+    }
 }

@@ -179,29 +179,18 @@ But that is not what we were going for. We wanted to outline each wall piece, an
 
 
 
-
-        const grd = G.create("canvas1", [300,300], [6,6]);
+        // COMPONENTS
+        grid = G.create("canvas1", [300,300], [6,6]);
         //grid.showGrid("canvas1", canvasSize, mapSize);
         
+        individualBlocks.map(w => grid.drawWall(w));
+
+
+
         [
-            [[2,1], [2,2], [3,2], [3,1]],
-            [[3,1], [3,2], [4,2], [4,1]],
-            [[4,1], [4,2], [5,2], [5,1]],
-            [[4,2], [4,3], [5,3], [5,2]],
-
-            [[1,3], [2,3], [2,4], [1,4]],
-            [[2,3], [3,3], [3,4], [2,4]],
-            [[1,4], [2,4], [2,5], [1,5]],
-            [[2,4], [3,4], [3,5], [2,5]],
-        ].map(w => grd.drawWall(w, blockSize));
-
-        var ctx = canvas.getContext("2d");
-        ctx.font = "30px Arial";
-        ctx.fillText("Hello World", 10, 50);
-
-        G.showGrid("canvas2", canvasSize, mapSize);
-        
-        outlinedBlocks.map(w => G.drawWall("canvas2", w, blockSize));
+            [2,1,"1"], [3,1,"2"], [4,1,"3"], [4,2,"4"],
+            [1,3,"5"], [2,3,"6"], [1,4,"7"], [2,4,"8"]
+        ].map(([x,y,s]) => grid.labelCell(x, y, s));
     }
 </script>
 
