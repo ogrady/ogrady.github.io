@@ -57,7 +57,7 @@ To fix this, we can decompose all blocked cells into [connected components](http
 5. If there are uncoloured pixels left, go to 1.
 
 But since we are working on the database, we will try to think less in a _one-at-a-time_ fashion, but use relations instead. For this, we will run one flood fill per pixel -- all at the same time. Instead of using colours, pixels will propagate a unique ID to their neighbours. If you look back at the schema for `environment.cells` (which, really, holds the pixels of the map) you will notice that they already have a serial primary key which works pretty well for this purpose.
-So each cell will try and propagate their ID to the their direct neighbours as illustrated above.
+So each cell will try and propagate their ID to their direct neighbours as illustrated above.
 The results of all those flood fills leaves us with one list of IDs for each cell, describing which IDs have been flooded over the cell in question. Now we only only need to deterministically select the ID that should be preferred over all other IDs in that list. I chose `MAX` to do that for me.
 
 ```sql
@@ -108,6 +108,8 @@ CREATE VIEW environment.compound_walls(cell_id, x, y, component_id) AS (
 ```
 The above query gives us one ID (`component_id`) per cell. All cells with the same `component_id` belong to the same connected component.
 
+<canvas id="canvas1" class="center-image"></canvas>
+
 ### Are We There Yet
 
 Not quite! So far, we have only assigned each cell, or more specifically: each cell that is part of a wall, to a connected component. This is already a nice thing to have, as we could now easily determine a [bounding box](https://en.wikipedia.org/wiki/Minimum_bounding_box) for each piece of wall. Using those is a common way to speed up collision detection, as you can make coarse grained search for collisions between object's bounding boxes, before going for the pixel-exact collision checks. They go well with a glass of wine and a side of [Quadtree](https://en.wikipedia.org/wiki/Quadtree) -- a spatial index structure that many DBMSs come bundled with or can be enhanced with using an extension.
@@ -129,12 +131,13 @@ But that is not what we were going for. We wanted to outline each wall piece, an
 
 
 <script type="module">
-    import * as grid from "{{ site.baseurl }}{% link assets/js/grid.js %}";
+    import * as G from "{{ site.baseurl }}{% link assets/js/grid.js %}";
 
     window.onload = () => {
+        let grid;
         const mapSize = [6,6];
         const canvasSize = [mapSize[0] * 50, mapSize[1] * 50];
-        const blockSize = grid.divideGrid(canvasSize, mapSize);
+        const blockSize = G.divideGrid(canvasSize, mapSize);
 
         const individualBlocks = [
             [[2,1], [2,2], [3,2], [3,1]],
@@ -166,19 +169,19 @@ But that is not what we were going for. We wanted to outline each wall piece, an
             [[2,4]],
         ];
 
-        grid.showGrid("canvas-boring-outlined", canvasSize, mapSize);
-        individualBlocks.map(w => grid.drawWall("canvas-boring-outlined", w, blockSize));
+        grid = G.create("canvas-boring-outlined", canvasSize, mapSize);
+        individualBlocks.map(w => grid.drawWall(w));
 
-        grid.showGrid("canvas-boring-filled", canvasSize, mapSize);
-        solidBlocks.map(w => grid.fillRectangleWall("canvas-boring-filled", w, blockSize));
-
-
+        grid = G.create("canvas-boring-filled", canvasSize, mapSize);
+        solidBlocks.map(w => grid.fillRectangleWall(w));
 
 
 
 
 
-        grid.showGrid("canvas1", canvasSize, mapSize);
+
+        const grd = G.create("canvas1", [300,300], [6,6]);
+        //grid.showGrid("canvas1", canvasSize, mapSize);
         
         [
             [[2,1], [2,2], [3,2], [3,1]],
@@ -190,18 +193,24 @@ But that is not what we were going for. We wanted to outline each wall piece, an
             [[2,3], [3,3], [3,4], [2,4]],
             [[1,4], [2,4], [2,5], [1,5]],
             [[2,4], [3,4], [3,5], [2,5]],
-        ].map(w => grid.drawWall("canvas1", w, blockSize));
+        ].map(w => grd.drawWall(w, blockSize));
 
-        grid.showGrid("canvas2", canvasSize, mapSize);
+        var ctx = canvas.getContext("2d");
+        ctx.font = "30px Arial";
+        ctx.fillText("Hello World", 10, 50);
+
+        G.showGrid("canvas2", canvasSize, mapSize);
         
-        outlinedBlocks.map(w => grid.drawWall("canvas2", w, blockSize));
+        outlinedBlocks.map(w => G.drawWall("canvas2", w, blockSize));
     }
 </script>
+
+<!--
 Given a function ⁅f⁆ of a real variable ⁅x⁆ and an interval ⁅[a, b]⁆ of the real line, the **definite integral**
 
 ⁅∫_a^b f(x) ⅆx⁆
 
-can be interpreted informally as the signed area of the region in the ⁅xy⁆-plane that is bounded by the graph of ⁅f⁆, the ⁅x⁆-axis and the vertical lines ⁅x = a⁆ and ⁅x = b⁆.
+can be interpreted informally as the signed area of the region in the ⁅xy⁆-plane that is bounded by the graph of ⁅f⁆, the ⁅x⁆-axis and the vertical lines ⁅x = a⁆ and ⁅x = b⁆.-->
 
 <canvas id="canvas1" class="center-image"></canvas>
 <canvas id="canvas2"></canvas>

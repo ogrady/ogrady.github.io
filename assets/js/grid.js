@@ -1,64 +1,76 @@
 export const divideGrid = ([canvasWidth, canvasHeight], [mapWidth, mapHeight]) => [Math.floor(canvasWidth / mapWidth), Math.floor(canvasHeight / mapHeight)];
 
-export function showGrid(canvasId, 
-                 canvasSize = [400, 400], 
-                 mapSize = [6, 6],
-                 backgroundStyle = "#000",
-                 gridStyle = "#222") 
-{
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext("2d");
-    const [canvasWidth, canvasHeight] = canvasSize;
-    const [mapWidth, mapHeight] = mapSize;
-    const [blockWidth, blockHeight] = divideGrid(canvasSize, mapSize);
+export const create = (canvasId, pixelSize, mapSize) => new Grid(canvasId).resize(pixelSize).showGrid(mapSize);
 
-    ctx.canvas.width = canvasWidth;
-    ctx.canvas.height = canvasHeight;
+export class Grid {
+    constructor(canvasId) {
+        this.canvasId = canvasId;
+        this.canvas = document.getElementById(this.canvasId);
+        this.ctx = this.canvas.getContext("2d");
+        this.blockSize = [1,1];  
+    }
 
-    // background
-    ctx.fillStyle = backgroundStyle;
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    resize([width, height]) {
+        this.ctx.canvas.width = width;
+        this.ctx.canvas.height = height;
+        return this;
+    }
 
-    // grid
-    ctx.strokeStyle = gridStyle;
-    ctx.beginPath();
-    for(let y = 0; y < mapHeight; y++) {
-        for(let x = 0; x < mapWidth; x++) {
-            ctx.rect(x * blockWidth, y * blockHeight, blockWidth, blockHeight);
+    getCanvasSize() {
+        return [this.ctx.canvas.width, this.ctx.canvas.height];
+    }
+
+    showGrid(mapSize, {backgroundStyle = "#000", gridStyle = "#222"} = {}) {
+        const [canvasWidth, canvasHeight] = this.getCanvasSize();
+        const [mapWidth, mapHeight] = mapSize;
+        this.blockSize = divideGrid(this.getCanvasSize(), mapSize);
+        const [blockWidth, blockHeight]  = this.blockSize;
+
+        // background
+        this.ctx.fillStyle = backgroundStyle;
+        this.ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+        // grid
+        this.ctx.strokeStyle = gridStyle;
+        this.ctx.beginPath();
+        for(let y = 0; y < mapHeight; y++) {
+            for(let x = 0; x < mapWidth; x++) {
+                this.ctx.rect(x * blockWidth, y * blockHeight, blockWidth, blockHeight);
+            }
         }
+        this.ctx.stroke();
+        return this;
     }
-    ctx.stroke();
-}
 
-export function drawWall(canvasId, points, blockSize, wallStyle = "#4287f5", wallWidth = 5) {
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext("2d");
-    const [blockWidth, blockHeight] = blockSize;
+    _path(points, consumer) {
+        const [blockWidth, blockHeight] = this.blockSize;
+        points = points.map(([x,y]) => [x*blockWidth, y*blockHeight]);
 
-    points = points.map(([x,y]) => [x*blockWidth, y*blockHeight]);
+        /*this.ctx.strokeStyle = wallStyle;
+        this.ctx.lineWidth = wallWidth;
+        */
 
-    ctx.strokeStyle = wallStyle;
-    ctx.lineWidth = wallWidth;
-    ctx.beginPath();
-    const [sx, sy] = points.shift();
-    ctx.moveTo(sx, sy);
-    for(const [x,y] of points) {
-        ctx.lineTo(x,y);
+        const [sx, sy] = points[0];
+        this.ctx.moveTo(sx, sy);
+        this.ctx.beginPath();        
+        points.map(consumer); //this.ctx.lineTo(x, y));
+        this.ctx.closePath();
+        this.ctx.stroke();
+        return this;        
     }
-    ctx.closePath();
-    ctx.stroke();
-}
 
-export function fillRectangleWall(canvasId, points, blockSize, wallStyle = "#4287f5", wallWidth = 5) {
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext("2d");
-    const [blockWidth, blockHeight] = blockSize;
+    drawWall(points, {wallStyle = "#4287f5", wallWidth = 5} = {}) {
+        this.ctx.strokeStyle = wallStyle;
+        this.ctx.lineWidth = wallWidth;
+        return this._path(points, ([x,y]) => this.ctx.lineTo(x,y));
+    }
 
-    points = points.map(([x,y]) => [x*blockWidth, y*blockHeight]);
+    fillRectangleWall(points, {wallStyle = "#4287f5", wallWidth = 5} = {}) {
+        const [blockWidth, blockHeight] = this.blockSize;
+        this.ctx.fillStyle = wallStyle;
+        this.ctx.lineWidth = wallWidth;
+        return this._path(points, ([x,y]) => this.ctx.fillRect(x, y, blockWidth, blockHeight));
+    }
 
-    ctx.fillStyle = wallStyle;
-    ctx.lineWidth = wallWidth;
-    ctx.beginPath();
-    points.map(([x,y]) => ctx.fillRect(x, y, blockWidth, blockHeight))
-    ctx.stroke();
+    //labelCell(canvasId, x, y, )
 }
