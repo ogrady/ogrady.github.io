@@ -320,7 +320,7 @@ closed(component_id, iteration, x, y) AS (
 
 That's it. The result is a series of positions the pinholes assumed when marching around each shape which an sorting order defined by `iteration`. Dumping these into a regular old drawing library as a list of `lineTo(x,y)`-instructions would result in the outlines for our walls. 
 
-But I have a little bit of icing left for this cake: marching squares actually produces too many instructions per wall. To be exact, it yields every encircled points in the following image:
+But I have a little bit of icing left for this cake: marching squares actually produces too many instructions per wall. To be exact, it yields every encircled point in the following image:
 
 
 <canvas id="too-many-instructions" class="center-image"></canvas>
