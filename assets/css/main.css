@@ -43,11 +43,20 @@ pre {
 }
 
 .rouge-gutter {
-    padding: 2px;
-
+    padding: 0px;
 }
 
+.rouge-table {
+    margin-bottom: 0px;
+}
 
+pre, .rouge-code {
+    padding: 4px;
+}
+
+canvas {
+    padding-bottom: 20px;
+}
 
 
 .highlight pre { background-color: #404040 }

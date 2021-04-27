@@ -47,7 +47,7 @@ With our current data structure, we can only visualise walls very plainly as adj
 <canvas id="canvas-boring-filled" ></canvas>
 </div>
 
-### Baby Steps
+### Biting Off Pieces
 To fix this, we can decompose all blocked cells into [connected components](https://en.wikipedia.org/wiki/Component_(graph_theory)), which are induced subgraphs in which all vertices are connected through a series of edge traversals. Or in other words: a part of a graph that forms a contiguous shape. Dissecting our map graph into such components in the case of Pac-Man is rather easy[^1]: cells are either walkable or not (i.e., the cell contains a wall). Colour a cell black if it is walkable and blue if it is not. Cells belong to the same component as their neighbour if they share the same colour. Programmatically, this can be achieved using a simple [flood fill](https://en.wikipedia.org/wiki/Flood_fill) algorithm:
 
 1. Select an arbitrary uncoloured pixel _p_.
@@ -349,7 +349,7 @@ reduced(component_id, iteration, x, y, superfluous) AS (
 )
 ```
 
-And now for the final step (pinky promise!) we select the relevant information and convert them into a format that is easily understandable for our render engine:
+For the final step (pinky promise!) we select the relevant information and convert them into a format that is easily understandable for our render engine:
 
 ```sql
 SELECT 
@@ -361,9 +361,13 @@ WHERE
     NOT superfluous
 GROUP BY 
     component_id
-
 );
 ```
+
+And there we have it. Beautiful, outlined walls as we know and love them: 
+
+<canvas id="final-result" class="center-image"></canvas>
+
 
 The result for one map I actually use for Pac-Man looks like this:
 
@@ -541,6 +545,9 @@ This is what a client will receive when connecting to the Pac-Man-DB and asking 
         individualBlocks.map(w => grid.drawWall(w));
         [[2,1], [2,2], [4,2], [4,3], [5,3], [5,1]].map(([x,y]) => grid.highlightPosition(x,y, {strokeStyle: "red"}));
         [[1,3], [1,5], [3,5], [3,3]].map(([x,y]) => grid.highlightPosition(x,y, {strokeStyle: "yellow"}));
+
+        grid = G.create("final-result", gridSize, mapSize);
+        outlinedBlocks.map(w => grid.drawWall(w));
         
     }
 </script>
@@ -557,4 +564,4 @@ can be interpreted informally as the signed area of the region in the ⁅xy⁆-p
 
 [^2]: [Simon P. Jones and Philip Wadler. "Comprehensive Comprehensions"](https://dl.acm.org/doi/10.1145/1291201.1291209).
 
-[^3]: Going from 2D to 3D, you would have [bounding _boxes_](https://en.wikipedia.org/wiki/Minimum_bounding_box) and [_Octrees_](https://de.wikipedia.org/wiki/Octree) instead.
+[^3]: Going from 2D to 3D you would have [bounding _boxes_](https://en.wikipedia.org/wiki/Minimum_bounding_box) and [_Octrees_](https://de.wikipedia.org/wiki/Octree) instead.
