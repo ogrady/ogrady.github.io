@@ -68,7 +68,7 @@ Notice how smaller numbers do not prevail against their neighbours, resulting in
 
 <canvas id="components-result" class="center-image"></canvas>
 
-Now we only only need to deterministically select the ID that should be preferred over all other IDs in that list. I chose `MAX` to do that for me.
+Now we only need to deterministically select the ID that should be preferred over all other IDs in that list. I chose `MAX` to do that for me.
 
 ```sql
 CREATE VIEW environment.compound_walls(cell_id, x, y, component_id) AS (
