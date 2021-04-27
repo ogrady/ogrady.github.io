@@ -56,11 +56,11 @@ To fix this, we can decompose all blocked cells into [connected components](http
 4. Propagate _c_ to all direct neighbours of _c_. For each neighbour of _c_, go to 3.
 5. If there are uncoloured pixels left, go to 1.
 
-But since we are working on the database, we will try to think less in a _one-at-a-time_ fashion, but use relations instead. For this, we will run one flood fill per pixel -- all at the same time. Instead of using colours, pixels will propagate a unique ID to their neighbours. If you look back at the schema for `environment.cells` (which, really, holds the pixels of the map) you will notice that they already have a serial primary key which works pretty well for this purpose:
+But since we are working with database, we will try to think less in a _one-at-a-time_ fashion, but use relations instead. For this, we will run one flood fill per pixel -- all at the same time. Instead of using colours, pixels will propagate a unique ID to their neighbours. If you look back at the schema for `environment.cells` (which, really, holds the pixels of the map) you will notice that they already have a serial primary key which works pretty well for this purpose:
 
 <canvas id="components-base" class="center-image"></canvas>
 
-So each cell will try and propagate their ID to their direct neighbours as illustrated above. For the sake of the reader's mental well-being, I will visualise the process on only one of the shapes. Differently coloured fills happen "at the same time". That does not necessarily mean "in parallel" (although the DBMS could do that), but rather "in the same pass". 
+So each cell will try and propagate their ID to their direct neighbours as illustrated above. For the sake of the reader's mental well-being, I will visualise the process for only one of the shapes. Differently coloured fills happen "at the same time". That does not necessarily mean "in parallel" (although the DBMS could do that), but rather "in the same pass". 
 
 <canvas id="components-animation" class="center-image"></canvas>
 
@@ -120,14 +120,14 @@ The above query gives us one ID (`component_id`) per cell. All cells with the sa
 
 ### Are We There Yet?!
 
-Not quite! So far, we have only assigned each cell, or more specifically: each cell that is part of a wall, to a connected component. This is already a nice thing to have, as we could now easily determine a [bounding rectangle](https://en.wikipedia.org/wiki/Minimum_bounding_rectangle) for each piece of wall. Using those is a common way to speed up collision detection, as you can start a coarse-grained search for collisions between object's bounding boxes, before going for the pixel-exact collision checks. They go well with a glass of wine and a side of [Quadtree](https://en.wikipedia.org/wiki/Quadtree) -- a spatial index structure that many DBMSs come bundled with or can be enhanced with using an extension[^3].
+Not quite! So far, we have only assigned each cell, or more specifically: each cell that is part of a wall, to a connected component. This is already a nice thing to have, as we could now easily determine a [bounding rectangle](https://en.wikipedia.org/wiki/Minimum_bounding_rectangle) for each piece of wall. Using those is a common way to speed up collision detection, as you can start a coarse-grained search for collisions between object's bounding rectangles, before going for the pixel-exact collision checks. They go well with a glass of wine and a side of [Quadtree](https://en.wikipedia.org/wiki/Quadtree) -- a spatial index structure that many DBMSs come bundled with or can be enhanced with using an extension[^3].
 But that is not what we were going for. We wanted to outline each wall piece, and for that we need another nice algorithm. Meet the [marching squares algorithm](https://en.wikipedia.org/wiki/Marching_squares)! Marching squares basically observes the edge of a shape through a pinhole (a 2×2 rectangle) and depending on what it sees, it moves the pinhole a bit up, down, to the left, or to the right, effectively marching around the shape in question. 
 
 <canvas id="marching-squares-animation" class="center-image"></canvas>
 
 Notice how we have multiple pinholes: one per connected component. They can all be moved at the same time and do not have to finish all at once. See how the yellow rectangle patiently waits for its red sibling to stop? That has nothing to do with their imminent collision; the yellow rectangle has simply finished its lap around its assigned shape already.
 
-Assuming that each pixel it sees is either part of the shape (`■`) or not (`□`), that leaves us with 4² = 16 different images we can see through the pinhole, and for each we can define how the pinhole should be shifted.
+Assuming that each pixel a pinhole sees is either part of the shape (`■`) or not (`□`), that leaves us with 4² = 16 different images we can see through the pinhole, and for each we can define how the pinhole should be shifted.
 
 <pre>
 □□     ■■     □□     ■■
@@ -143,9 +143,11 @@ Assuming that each pixel it sees is either part of the shape (`■`) or not (`�
 □■ ↓   ■□ ←   □■ ↓   ■■ ✕  
 </pre>
 
-We start out by putting the 16 possible images we can see through the pinhole in a relational fashion. Removing line breaks gives us a unique hash for every combination. The direction can be expressed in terms of an (x,y)-shift. E.g. `('□□□□',  1,  0)` is "when encountering `□□□□`, add 1 to the x-position of the pinhole and leave y-position be". I omit the 16th `■■■■`-state, as it is basically an error, implying that the pinhole is set directly onto a solid object, rather than its edge.
+We start out by putting the 16 possible images we can see through the pinhole into a table (or rather: CTE). Removing line breaks gives us a unique hash for every combination. The direction can be expressed in terms of an (x,y)-shift. E.g. `('□□□□',  1,  0)` is "when encountering `□□□□`, add 1 to the x-position of the pinhole and leave y-position be". I omitted the 16th `■■■■`-state, as it is basically an error-state, implying that the pinhole is set directly onto a solid object, rather than its edge.
 
 ```sql
+CREATE VIEW environment.wall_shapes(wall, coordinates) AS (
+WITH RECURSIVE
 moves(hash, x_off, y_off) AS (
     VALUES
     ('□□□□',  1,  0), ('■■□□',  1,  0), ('□□■■', -1,  0), ('■■■□', 1,  0),
@@ -155,7 +157,7 @@ moves(hash, x_off, y_off) AS (
 ),
 ```
 
-We start out with a grid where we know the appropriate component ID for each cell (see above). We also add a bit of fluff to each side of the map. One empty cell, to be exact. This is required to properly walk around shapes that extend all the way to the edge of the map.
+We start out with a grid where we know the appropriate component ID for each cell (see above). We also add a bit of fluff to each side of the map. One row/ column of empty cells to each side, to be exact. This is required to properly walk around shapes that extend all the way to the edge of the map.
 
 ```sql
 grid(x, y, passable, component_id) AS (
@@ -182,7 +184,7 @@ grid(x, y, passable, component_id) AS (
 ),
 ```
 
-For each component we select one coordinate to start from. In general, you can choose an arbitrary position to start. But here I chose the bottom-right-most cell of each component. Marching squares has a bit of an issue with bodies with holes in them. Depending on what your offsets define and where you start, you will either get the shape describing the inside or the outside of the body. The only body with a hole in it in the case of Pac-Man is the outer wall, confining the map. I would like the inner shape of that, hence the starting point.
+For each component we select one coordinate to start from. In general, you can choose an arbitrary position to start. But here I chose the bottom-right-most cell of each component. Marching squares has a bit of an issue with bodies with holes in them. Depending on what your offsets define and where you start, you will either get the shape describing the inside or the outside of the body. The only body with a hole in it in the case of Pac-Man is the outer wall which confines the map. I would like the inner shape of that, hence the starting point.
 ```sql
 start_coordinates(x, y, component_id) AS (
     SELECT DISTINCT ON (component_id)
@@ -216,9 +218,9 @@ And off we go! Marching squares works as described:
 1. at the position of all pinholes (we have one per component) span a 2×2 rectangle (`squares`)
 2. hash what you are seeing through the pinholes (`hashes`)
 3. join the constructed hashes on the possible hashes from `moves`
-4. select the next position for each pinhole by applying the offsets from `moves` we just found
+4. select the next position for each pinhole by applying the offsets from `moves` we just found.
 
-Each pinhole stops moving if it would move onto its starting position, thus producing no new row for the CTE. If all pinholes have stopped moving, no new rows are produced and the recursion stops.
+Each pinhole stops moving if it would move onto its starting position, thus producing no new row for the recursive CTE. If all pinholes have stopped moving, no new rows are produced and the recursion stops.
 
 ```sql
 marching_squares↺(iteration, x, y, component_id, start) AS (
@@ -327,8 +329,8 @@ But since we will be drawing straight lines between points, we actually only nee
 
 <canvas id="fewer-instructions" class="center-image"></canvas>
 
-I'll admit, this probably falls into the realm of premature optimisation, as it saves us only a few points for our use case at hand. But scaled up to much larger maps and with the goal in mind to do as much heavy lifting on the DBMS and slim down the clients as much as possible, let's do it!
-It's super easy anyway: for each point we look at the the point preceding and succeeding it. If they they all share either their x- or they x-position, they are all part of a straight line and the point we are looking at is superfluous and can be marked as such. 
+I'll admit, this probably falls into the realm of premature optimisation, as it saves us only a few intermediate points for our use case at hand. But scaled up to much larger maps and with the goal in mind to do as much heavy lifting on the DBMS and slim down the clients as much as possible, let's do it!
+It's super easy anyway: for each point we look at the the point preceding and succeeding it. If they all share either their x- or their x-position, they are all part of a horizontal or vertical line and the point we are looking at is superfluous and can be marked as such. 
 
 
 ```sql
@@ -349,7 +351,7 @@ reduced(component_id, iteration, x, y, superfluous) AS (
 )
 ```
 
-For the final step (pinky promise!) we select the relevant information and convert them into a format that is easily understandable for our render engine:
+For the final step (pinky promise!) we select the relevant information and convert them into a format that is easily understandable for our rendering engine:
 
 ```sql
 SELECT 
