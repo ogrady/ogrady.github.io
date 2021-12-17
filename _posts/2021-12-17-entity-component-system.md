@@ -146,12 +146,12 @@ FROM
 
 which results in:
 
-```sql
+<pre>
 id |   type   |  health |  x  |  y  | weapon
 ---+----------+---------+-----+-----+--------
  1 | Skeleton |      10 |   1 |   3 | Axe
  2 | Zombie   |       8 |  43 |  32 |  
-```
+</pre>
 
 
 Note how we use `LEFT JOIN`s in this _full_ view to make sure we include entities for which we don't have an entry for any given component, as is the case for our `Zombie` regarding `weapon_components`.
