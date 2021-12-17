@@ -6,7 +6,7 @@ categories: jekyll update
 ---
 
 ## The Yawning Gash
-If you have ever dabbled in video game development in the past ten or twenty years, chances are you used an object oriented programming language to do so. Hell, my first attempts at creating a game were done using the [jMonkey engine](jmonkey). And one can easily see why OOP is popular for game development: it is very convenient to summarise data into semantic classes:
+If you have ever dabbled in video game development in the past ten or twenty years, chances are you used an object oriented programming language to do so. Hell, my first attempts at creating a game were done using the [jMonkey engine][jmonkey]. And one can easily see why OOP is popular for game development: it is very convenient to summarise data into semantic classes:
 
 ```java
 public class Position {
@@ -62,12 +62,12 @@ for(Monster m : monsters) {
 
 ```
 
-So the idea of marrying video games and OOP sounds just perfect. SQL on the other hand lacks cool OOP mechanisms such as [inheritance](impedance). So it is completely unusable for video game logic. Right?
+So the idea of marrying video games and OOP sounds just perfect. SQL on the other hand lacks cool OOP mechanisms such as [inheritance][impedance]. So it is completely unusable for video game logic. Right?
 
-Actually, inheritance can give you severe headaches when you have a large variety of classes where each class differs a little bit. Think: in addition to your regular unarmed `Skeleton` and `Zombie` you want to have a variant of each that wields an axe. So you start adding `SkeletonWithAxe` and `ZombieWithAxe`. This leads to an explosion of classes and suddenly it becomes very annoying to add in new weapons and enemy types. This issue can be solved using the [decorator pattern](decorator) in OOP. But there is also a related pattern that is mostly used within the gaming industry, called the _entity component system_ (ECS) where inheritance is dropped almost completely in favour of a more modular approach.
+Actually, inheritance can give you severe headaches when you have a large variety of classes where each class differs a little bit. Think: in addition to your regular unarmed `Skeleton` and `Zombie` you want to have a variant of each that wields an axe. So you start adding `SkeletonWithAxe` and `ZombieWithAxe`. This leads to an explosion of classes and suddenly it becomes very annoying to add in new weapons and enemy types. This issue can be solved using the [decorator pattern][decorator] in OOP. But there is also a related pattern that is mostly used within the gaming industry, called the _entity component system_ (ECS) where inheritance is dropped almost completely in favour of a more modular approach.
 
 ## Entity Component System
-Within an ECS, all "things" you encounter, like our enemies above, are _entities_. An entity can be reduced to a single unique identifier (can you smell the primary key already?). _Components_ are everything that can be attached to an entity. In our above example that would be the monster's health and its position. Components are attached to their respective entity through the entity's identifier (foreign keys, anyone?). This allows us to attach and detach components to and from entities during runtime. This layout also facilitates accessing only the components we need for certain calculations. For example, in the above code snippet that moves all monsters to the right, we don't need to know the health of any monster. Instead, we are accessing a single component of _all_ monsters, which is commonly the case in calculations related to games. This is called [locality of reference](https://en.wikipedia.org/wiki/Locality_of_reference) which is exploited in [column-oriented DBMSs](codbms).
+Within an ECS, all "things" you encounter, like our enemies above, are _entities_. An entity can be reduced to a single unique identifier (can you smell the primary key already?). _Components_ are everything that can be attached to an entity. In our above example that would be the monster's health and its position. Components are attached to their respective entity through the entity's identifier (foreign keys, anyone?). This allows us to attach and detach components to and from entities during runtime. This layout also facilitates accessing only the components we need for certain calculations. For example, in the above code snippet that moves all monsters to the right, we don't need to know the health of any monster. Instead, we are accessing a single component of _all_ monsters, which is commonly the case in calculations related to games. This is called [locality of reference][https://en.wikipedia.org/wiki/Locality_of_reference] which is exploited in [column-oriented DBMSs][codbms].
 
 Let's see how our above example could look as a database schema:
 
@@ -157,7 +157,7 @@ id |   type   |  health |  x  |  y  | weapon
 Note how we use `LEFT JOIN`s in this _full_ view to make sure we include entities for which we don't have an entry for any given component, as is the case for our `Zombie` regarding `weapon_components`.
 
 # Moar ECS
-In summary: a DBMS is a great storage for video game entities when you apply a modern pattern like the entity component system. You can find more elaborate examples of using an ECS in SQL in my [PacmanSQL](pacmansql)-project, for example in the [environmental calculations](environment-sql).
+In summary: a DBMS is a great storage for video game entities when you apply a modern pattern like the entity component system. You can find more elaborate examples of using an ECS in SQL in my [PacmanSQL][pacmansql]-project, for example in the [environmental calculations][environment-sql].
 
 <hr>
 
