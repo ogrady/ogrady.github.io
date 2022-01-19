@@ -70,7 +70,7 @@ With everything in place, I just used double-sided tape to attach the box direct
 And for the final step, integrating the remote into Home Assistant.
 
 ### Custom Script
-Personally, I use Node Red to concoct all my workflows. So I ended up with a series of buttons, each calling custom HA script which fires an `IR Command` event with the IR code (`code`), the remote's hostname (`host`)[^1], and optionally an enum value which is conveniently converted into the match IR code, as payload. 
+Personally, I use Node Red to concoct all my workflows. So I ended up with a series of buttons, each calling custom HA script which fires an `IR Command` event with the IR code (`code`), the remote's hostname (`host`)[^1], and optionally an enum value `command` which is conveniently converted into the matching IR code, as payload. 
 
 ```yaml
 {% raw %}event: IR Command
