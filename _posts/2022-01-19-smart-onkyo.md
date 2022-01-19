@@ -54,17 +54,17 @@ Next, I removed the IR sensor, put up an IR sender instead and wrote a little sc
 
 
 ## Casing
-I have taught myself a bit of FreeCAD, so the casing is by no means perfect, but it works fine. The case for the MC (brown) and the sensor (purple) can be printed as a single part. Wedge the MC into the brown casing, mount the IR sender onto the pins of the purple casing, close with the lid.
+I have taught myself a bit of FreeCAD, so the casing is by no means perfect, but it works fine. The case for the MC (brown) and the sender (purple) can be printed as a single part. Wedge the MC into the brown casing, mount the IR sender onto the pins of the purple casing, close with the lid.
 
 ![Casing Wemos](/assets/images/onkyo/ir_box1.png){: .center-image }
 ![Casing IR Sender](/assets/images/onkyo/ir_box2.png){: .center-image }
 ![Casing Lid](/assets/images/onkyo/ir_box3.png){: .center-image }
 
-Also, I learned not to be too generous with the shrinking tube as it was impossible to fit the sensor into the designated box, so I had to cut back on that...
+Also, I learned not to be too generous with the shrinking tube as it was impossible to fit the sender into the designated box, so I had to cut back on that...
 
 ![Wemos Cased](/assets/images/onkyo/cased.jpg){: .center-image }
 
-With everything in place, I just used double-sided tape to attach the box directly to my Onkyo so that the IR sensor of my box would line up with the IR sensor of the Onkyo.
+With everything in place, I just used double-sided tape to attach the box directly to my Onkyo so that the IR sender of my box would line up with the IR sensor of the Onkyo.
 
 ## Home Assistant
 And for the final step, integrating the remote into Home Assistant.
@@ -110,7 +110,7 @@ The code for the above screenshot ended up a bit verbose and complicated, as I a
 
 ## Conclusion
 Integrating my Onkyo into my smart home took me longer than I initially hoped for (with all trial and error, not counting any breaks I took from the project when I was too frustrated, designing, printing and scrapping several prototypes for the casing, etc.) it took me around two weeks. But it was totally worth the effort and I am amazed by all the existing resources I could make use of. ❤️
-Open source is truly amazing and I am therefore trying to give a back to the community by [publishing the source code and CAD file][repository] for the casing alongside this article.
+Open source is truly amazing and I am therefore trying to give back to the community by [publishing the source code and CAD file][repository] for the casing alongside this article.
 
 <hr>
 
