@@ -81,7 +81,7 @@ event_data:
 ```
 
 ### Node Red
-Node Red listens for those events and fires an HTTP request with that 
+Node Red listens for those events and fires an HTTP request with the data from the payload.
 
 ![Node Red Flow](/assets/images/onkyo/ir_flow_node_red.png){: .center-image }
 
@@ -90,7 +90,7 @@ Node Red listens for those events and fires an HTTP request with that
 ```
 
 ### Lovelace 
-So finally, I was able to have my Onkyo integrated into my smart home. With matching labels for each button, the convenience to control it remotely (just in case I want to control the volume while I am in another room, for example).
+So finally, I was able to have my Onkyo integrated into my smart home. With matching labels for each button and the convenience to control it remotely (just in case I want to adjust the volume while I am in another room, for example).
 
 ![Home Assistant Remote](/assets/images/onkyo/ir_ha_remote.png){: .center-image }
 
