@@ -110,7 +110,7 @@ The code for the above screenshot ended up a bit verbose and complicated, as I a
 
 ## Conclusion
 Integrating my Onkyo into my smart home took me longer than I initially hoped for (with all trial and error, not counting any breaks I took from the project when I was too frustrated, designing, printing and scrapping several prototypes for the casing, etc.) it took me around two weeks. But it was totally worth the effort and I am amazed by all the existing resources I could make use of. ❤️
-Open source is truly amazing and I am therefore trying to give back to the community by [publishing the source code and CAD file][repository] for the casing alongside this article.
+[The source code and CAD file for the casing][repository] are available online.
 
 <hr>
 
